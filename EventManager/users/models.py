@@ -13,7 +13,5 @@ class User(AbstractUser):
 
     groups = models.ManyToManyField(Group, related_name='custom_user_groups')
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_permissions') 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')  
-    phone_number = models.CharField(max_length=15, blank=True, null=True)  
+
      

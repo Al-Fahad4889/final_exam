@@ -1,11 +1,14 @@
-from django.shortcuts import render
+from urllib import request
+from django.shortcuts import redirect, render
 from rest_framework import generics, permissions, status, serializers
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model, logout
-from .models import Profile
-from .serializers import UserSerializer, ProfileSerializer
+
+from .forms import SignUpForm
+
+from .serializers import UserSerializer
 
 
 User = get_user_model()
@@ -23,6 +26,16 @@ class RegisterView(generics.CreateAPIView):
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError("A user with this email already exists.")
         serializer.save()
+    def signup(request):
+        if request.method == 'POST':
+            form = SignUpForm(request.POST)
+            if form.is_valid():
+                user = form.save()
+                (request, user)  
+                return redirect('login')  
+        else:
+            form = SignUpForm()
+        return render(request, 'signup.html', {'form': form})
 
 class LoginView(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
@@ -35,6 +48,8 @@ class LoginView(ObtainAuthToken):
             'user_id': user.id,
             'email': user.email,
         })
+    
+    
 
 class LogoutView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
